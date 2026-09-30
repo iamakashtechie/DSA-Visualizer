@@ -1,0 +1,134 @@
+[
+  {
+    "slug": "two-pointer",
+    "title": "Two Pointer",
+    "description": "Use when sorted array or string allows converging from both ends",
+    "problemCount": 20,
+    "groups": [
+      "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
+      "Pattern 2: Same-Direction Pointers (slow / fast, in-place overwrite)",
+      "Pattern 3: Fast & Slow Pointers on Linked Lists",
+      "Pattern 4: Sliding Window (a two-pointer variant with a shrinking/expanding window)",
+      "Quick Reference Table"
+    ],
+    "signals": []
+  },
+  {
+    "slug": "sliding-window",
+    "title": "Sliding Window",
+    "description": "Use when finding optimal contiguous subarray/substring",
+    "problemCount": 14,
+    "groups": [],
+    "signals": []
+  },
+  {
+    "slug": "binary-search",
+    "title": "Binary Search",
+    "description": "Use when you can define a monotonic predicate over a search space",
+    "problemCount": 20,
+    "groups": [
+      "1. Classic Binary Search on a Sorted Array",
+      "2. Binary Search on Rotated Sorted Array",
+      "3. Peak Finding (Bitonic Structure)",
+      "4. Binary Search on the Answer — Minimize the Maximum",
+      "5. Binary Search on the Answer — Maximize the Minimum",
+      "6. Binary Search on a 2D Matrix",
+      "7. Binary Search Across Two Sorted Structures / Kth Element",
+      "8. Binary Search on Real-Valued / Root-Finding Problems",
+      "Quick Reference Table"
+    ],
+    "templates": "# Binary Search — The Pattern, Not Just \"Search a Sorted Array\"\n\nBinary search applies whenever you can define a **monotonic predicate** `P(x)` over a search space —\ni.e. `P(x)` is `false...false, true...true` (or vice versa) — and you want the boundary. The \"search\nspace\" doesn't have to be array indices; it can be a value range, an answer range, or anything ordered.\n\nTwo templates cover almost every problem below:\n\n```cpp\n// Template A: find leftmost index where predicate becomes true (lo < hi, hi = mid)\nint lo = LOW, hi = HIGH;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (predicate(mid)) hi = mid;      // mid could be the answer, look left\n    else lo = mid + 1;                 // mid is not good enough, look right\n}\n// lo == hi == answer\n\n// Template B: find rightmost index where predicate is true (lo < hi, lo = mid, upward-biased mid)\nint lo = LOW, hi = HIGH;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo + 1) / 2;  // bias UP to avoid infinite loop\n    if (predicate(mid)) lo = mid;      // mid is good, try to push further\n    else hi = mid - 1;\n}\n```\n\nEvery problem below is tagged with which template (or minor variant) it uses.\n\n---\n",
+    "signals": []
+  },
+  {
+    "slug": "backtracking",
+    "title": "Backtracking",
+    "description": "Use when exploring all possibilities with choose/explore/unchoose",
+    "problemCount": 16,
+    "groups": [
+      "Table of Contents",
+      "1. Subset Generation (start-index pattern)",
+      "2. Combination Sum Family (target-sum backtracking)",
+      "3. Combinations (choose k)",
+      "4. Permutations (used[] pattern)",
+      "5. Partitioning (start-index over a string)",
+      "6. Grid / Board DFS-Backtracking (visited marking)",
+      "7. Position-wise String Building",
+      "Pattern Summary Table"
+    ],
+    "signals": []
+  },
+  {
+    "slug": "greedy",
+    "title": "Greedy",
+    "description": "Use when locally optimal choices lead to a globally optimal solution",
+    "problemCount": 18,
+    "groups": [
+      "Table of Contents",
+      "1. Interval Scheduling — Sort by End Time",
+      "2. Interval Merging — Sort by Start Time",
+      "3. Reachability / Same-Direction Scan",
+      "4. Sorting + Two-Pointer Pairing",
+      "5. Monotonic Stack Greedy",
+      "6. Local Exchange-Argument Greedy",
+      "7. Heap-Based Greedy",
+      "Quick Reference Table"
+    ],
+    "signals": []
+  },
+  {
+    "slug": "bit-manipulation",
+    "title": "Bit Manipulation",
+    "description": "Use when operations on individual bits can simplify the solution",
+    "problemCount": 16,
+    "groups": [
+      "Table of Contents",
+      "Group 1: Basic Bit Counting & Checks",
+      "Group 2: XOR Properties — Finding Unique/Missing Elements",
+      "Group 3: Bitmask for Subsets / Combinatorics",
+      "Group 4: Bit-Level Arithmetic (No `+`/`-`/`/` Operators)",
+      "Group 5: Range, Complement & Reversal Tricks",
+      "Group 6: Advanced XOR — Trie on Bits",
+      "Core Bit Tricks Cheat Sheet"
+    ],
+    "signals": []
+  },
+  {
+    "slug": "graph",
+    "title": "Graph",
+    "description": "Use when modeling relationships, paths, or connectivity between entities",
+    "problemCount": 20,
+    "groups": [
+      "A. Grid Traversal (DFS/BFS Flood Fill & Connected Components)",
+      "B. Union-Find / Disjoint Set (Connected Components)",
+      "C. Topological Sort (DAG Ordering & Cycle Detection)",
+      "D. BFS Shortest Path (Unweighted Graphs)",
+      "E. Dijkstra's Algorithm (Weighted Shortest Path, Non-negative Weights)",
+      "F. Bellman-Ford (Shortest Path with Constraints / Negative Weights)",
+      "G. Minimum Spanning Tree (Prim's)",
+      "H. Bipartite Graph Coloring",
+      "I. Graph Construction / Cloning",
+      "Quick Reference Table"
+    ],
+    "signals": []
+  },
+  {
+    "slug": "dp",
+    "title": "Dynamic Programming",
+    "description": "Use when optimal substructure and overlapping subproblems exist",
+    "problemCount": 20,
+    "groups": [
+      "1. Linear / 1D DP (Fibonacci-style)",
+      "2. Grid / 2D Path DP",
+      "3. 0/1 Knapsack Pattern",
+      "4. Unbounded Knapsack Pattern",
+      "5. Longest Common Subsequence Family (Two Strings)",
+      "6. Longest Increasing Subsequence Family",
+      "7. Palindrome DP",
+      "8. Interval DP (Matrix-Chain style)",
+      "9. State Machine DP (Stock Trading)",
+      "Quick Reference Table"
+    ],
+    "signals": []
+  }
+]

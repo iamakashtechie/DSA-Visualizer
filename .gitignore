@@ -1,0 +1,45 @@
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+.env/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Build and coverage output
+dist/
+build/
+out/
+coverage/
+.cache/
+.vite/
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE and editor files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local databases and temporary files
+*.sqlite
+*.sqlite3
+*.tmp
+*.temp

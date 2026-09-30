@@ -1,0 +1,47 @@
+:root {
+  --bg: #ffffff;
+  --surface: #f8f9fa;
+  --surface-2: #f1f3f5;
+  --border: #dee2e6;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --accent: #4f46e5;
+  --accent-contrast: #ffffff;
+  --focus: #4f46e5;
+
+  /* Visualization Tokens (shared) */
+  --viz-idle: #e5e7eb;
+  --viz-active: #4f46e5;
+  --viz-pointer-a: #059669;
+  --viz-pointer-b: #dc2626;
+  --viz-pointer-c: #d97706;
+  --viz-window: #dbeafe;
+  --viz-visited: #a7f3d0;
+  --viz-success: #059669;
+  --viz-danger: #dc2626;
+  --viz-muted: #9ca3af;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f0f1a;
+  --surface: #1a1a2e;
+  --surface-2: #252540;
+  --border: #2d2d4e;
+  --text: #f1f3f5;
+  --text-muted: #9ca3af;
+  --accent: #6366f1;
+  --accent-contrast: #ffffff;
+  --focus: #6366f1;
+
+  /* Visualization Tokens (dark overrides for contrast if needed, keeping them same per spec for some but spec allows these overrides) */
+  --viz-idle: #374151;
+  --viz-active: #6366f1;
+  --viz-pointer-a: #10b981;
+  --viz-pointer-b: #ef4444;
+  --viz-pointer-c: #f59e0b;
+  --viz-window: #1e3a5f;
+  --viz-visited: #064e3b;
+  --viz-success: #10b981;
+  --viz-danger: #ef4444;
+  --viz-muted: #6b7280;
+}
