@@ -8,6 +8,14 @@ import { traceRegistry } from '../traces/registry';
 import { createL } from '../traces/lib/lineResolver';
 import { collectSteps } from '../traces/lib/helpers';
 import { ArrayPointersRenderer } from '../renderers/array-pointers/ArrayPointersRenderer';
+import { LinkedListRenderer } from '../renderers/linked-list/LinkedListRenderer';
+import { DPTableRenderer } from '../renderers/dp-table/DPTableRenderer';
+import { IntervalTimelineRenderer } from '../renderers/interval-timeline/IntervalTimelineRenderer';
+import { GridBoardRenderer } from '../renderers/grid-board/GridBoardRenderer';
+import { RecursionTreeRenderer } from '../renderers/recursion-tree/RecursionTreeRenderer';
+import { GraphViewRenderer } from '../renderers/graph-view/GraphViewRenderer';
+import { BitGridRenderer } from '../renderers/bit-grid/BitGridRenderer';
+import { SidePanels } from '../renderers/panels/SidePanels';
 import { Player } from '../components/Player';
 import { VariablesPanel } from '../components/VariablesPanel';
 
@@ -143,6 +151,42 @@ export function Problem() {
                   <ArrayPointersRenderer state={currentStep.state} />
                 </div>
               )}
+              {currentStep.state.renderer === 'linked-list' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <LinkedListRenderer state={currentStep.state} />
+                </div>
+              )}
+              {currentStep.state.renderer === 'dp-table' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <DPTableRenderer state={currentStep.state} />
+                </div>
+              )}
+              {currentStep.state.renderer === 'interval-timeline' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <IntervalTimelineRenderer state={currentStep.state} />
+                </div>
+              )}
+              {currentStep.state.renderer === 'grid-board' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <GridBoardRenderer state={currentStep.state} />
+                </div>
+              )}
+              {currentStep.state.renderer === 'recursion-tree' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <RecursionTreeRenderer state={currentStep.state} />
+                </div>
+              )}
+              {currentStep.state.renderer === 'graph-view' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <GraphViewRenderer state={currentStep.state} />
+                </div>
+              )}
+              {currentStep.state.renderer === 'bit-grid' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <BitGridRenderer state={currentStep.state} />
+                </div>
+              )}
+              <SidePanels state={currentStep.state} />
               <Player />
               <VariablesPanel vars={currentStep.vars} />
             </>

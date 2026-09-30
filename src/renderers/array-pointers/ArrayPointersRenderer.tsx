@@ -1,4 +1,4 @@
-import type { ArrayPointersState, Pointer } from '../../traces/lib/types';
+import type { ArrayPointersState, Pointer, CellState } from '../../traces/lib/types';
 
 interface ArrayPointersRendererProps {
   state: ArrayPointersState;
@@ -59,6 +59,18 @@ const CELL_STROKE: Record<string, string> = {
 const CELL_STROKE_DASH: Record<string, string> = {
   window: '4,2',
 };
+
+export function getCellColors(state: CellState): { bg: string; border: string; text: string } {
+  return {
+    bg: CELL_FILLS[state] || CELL_FILLS.idle,
+    border: CELL_STROKE[state] || 'var(--border)',
+    text: CELL_TEXT_COLORS[state] || CELL_TEXT_COLORS.idle,
+  };
+}
+
+export function getPointerColor(variant: 'a' | 'b' | 'c'): string {
+  return POINTER_COLORS[variant] || 'var(--accent)';
+}
 
 function cellX(index: number): number {
   return index * (CELL_W + CELL_GAP);

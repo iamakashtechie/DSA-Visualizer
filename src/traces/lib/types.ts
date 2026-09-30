@@ -27,19 +27,84 @@ export interface Pointer {
 
 // ── Renderer state union ─────────────────────────────────────────────────────
 
-export interface ArrayPointersState {
+// ── Side Panels ──────────────────────────────────────────────────────────────
+export interface PanelState {
+  stack?: Array<number | string>;
+  queue?: Array<number | string>;
+  hash?: Record<string, number | string>;
+  heap?: Array<number | string>;
+}
+
+// ── Renderer States ──────────────────────────────────────────────────────────
+
+export interface ArrayPointersState extends PanelState {
   renderer: 'array-pointers';
   array: ArrayCell[];
   pointers: Pointer[];
   window?: { left: number; right: number };
-  outputArray?: ArrayCell[];
-  /** Optional side panels */
-  hashMap?: Record<string, number | string>;
-  stack?: Array<number | string>;
 }
 
-/** Extend as more renderers are added in M2 */
-export type RendererState = ArrayPointersState;
+export interface LinkedListNode {
+  id: string;
+  value: string | number;
+  state: CellState;
+  next?: string; // id of next node
+  pointers?: Pointer[]; // pointers pointing to this node
+}
+
+export interface LinkedListState extends PanelState {
+  renderer: 'linked-list';
+  nodes: LinkedListNode[];
+  head?: string;
+}
+
+export interface DPTableState extends PanelState {
+  renderer: 'dp-table';
+  table: ArrayCell[][]; // 2D grid of cells
+  rowLabels?: string[];
+  colLabels?: string[];
+  pointers?: { r: number; c: number; variant: 'a' | 'b' | 'c'; name: string }[];
+}
+
+export interface GridBoardState extends PanelState {
+  renderer: 'grid-board';
+  grid: ArrayCell[][];
+  pointers?: { r: number; c: number; variant: 'a' | 'b' | 'c'; name: string }[];
+}
+
+export interface RecursionTreeState extends PanelState {
+  renderer: 'recursion-tree';
+  nodes: Record<string, { value: string | number; state: CellState; children: string[] }>;
+  rootId?: string;
+}
+
+export interface IntervalTimelineState extends PanelState {
+  renderer: 'interval-timeline';
+  intervals: { start: number; end: number; state: CellState; id: string }[];
+  sweepLine?: number;
+}
+
+export interface GraphViewState extends PanelState {
+  renderer: 'graph-view';
+  nodes: { id: string; label: string; state: CellState }[];
+  edges: { u: string; v: string; state: CellState; directed?: boolean; weight?: number }[];
+}
+
+export interface BitGridState extends PanelState {
+  renderer: 'bit-grid';
+  numbers: { label: string; value: number; bits: number[] }[];
+  activeBitIndex?: number;
+}
+
+export type RendererState =
+  | ArrayPointersState
+  | LinkedListState
+  | DPTableState
+  | GridBoardState
+  | RecursionTreeState
+  | IntervalTimelineState
+  | GraphViewState
+  | BitGridState;
 
 // ── Event vocabulary ─────────────────────────────────────────────────────────
 
@@ -87,7 +152,7 @@ export interface Step {
 export type LineResolver = (needle: string, nth?: number) => number;
 
 export interface InputField {
-  type: 'int-array' | 'int' | 'string' | 'int-grid';
+  type: 'int-array' | 'int' | 'string' | 'int-grid' | 'json';
   label: string;
   description?: string;
   /** Inclusive maximum length/value for the cap check */
@@ -98,7 +163,7 @@ export interface InputField {
 export type InputSchema = Record<string, InputField>;
 
 export interface TraceModule<TInput = any> {
-  renderer: 'array-pointers';
+  renderer: RendererState['renderer'];
   inputSchema: InputSchema;
   defaultInput: TInput;
   samples: Array<{ input: TInput; expected: unknown }>;

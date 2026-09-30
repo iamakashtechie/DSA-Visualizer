@@ -126,9 +126,40 @@ All changes to the DSA Pattern Visualizer are logged here chronologically so any
 - ✅ Player supports exact scrubbing, line highlighting is in sync.
 - ✅ All 3 flagship traces work perfectly.
 
-### Next: M2
-- Full problem coverage for Two Pointer, Sliding Window, and Binary Search (54 traces).
-- New renderers: `sliding-window`, `2d-grid`, `1d-dp`, `tree`.
-- `add-pattern-renderer` skill.
+## 2026-09-30 — Milestone 2 (M2) Complete
 
----
+### What was built
+
+**Skills & Typing**
+- Created `.claude/skills/add-pattern-renderer/SKILL.md` to guide addition of new generic SVG renderers.
+- Expanded `RendererState` in `types.ts` to include all remaining visualization structures: `LinkedListState`, `DPTableState`, `GridBoardState`, `RecursionTreeState`, `IntervalTimelineState`, `GraphViewState`, `BitGridState`.
+- Implemented `PanelState` to allow side panels to be attached to any state.
+
+**New Renderers & Flagship Traces**
+Built 7 new custom SVG-based renderers, fully responsive down to 360px viewport, heavily utilizing CSS variable colors for themes. Each was verified with a comprehensive Trace Module:
+1. `LinkedListRenderer` -> `141 Linked List Cycle` (`two-pointer/linked-list-cycle`)
+2. `DPTableRenderer` -> `70 Climbing Stairs` (`dp/climbing-stairs`)
+3. `GridBoardRenderer` -> `200 Number of Islands` (`graph/number-of-islands`)
+4. `IntervalTimelineRenderer` -> `56 Merge Intervals` (`greedy/merge-intervals`)
+5. `RecursionTreeRenderer` -> `78 Subsets` (`backtracking/subsets`)
+6. `GraphViewRenderer` -> `207 Course Schedule` (`graph/course-schedule`)
+7. `BitGridRenderer` -> `191 Number of 1 Bits` (`bit-manipulation/number-of-1-bits`)
+
+**Side Panels**
+- Created `SidePanels` component to dynamically render `Stack`, `Queue`, `Heap (Array)`, and `Hash Map` below the primary visualizer when their respective arrays/objects exist in the trace `state`.
+
+### Build verification
+- `npm run build` ✅ — zero TypeScript errors, zero build errors
+- `npm run test` ✅ — 41/41 tests passing (including the 7 new traces)
+
+### M2 done when
+> Each renderer has at least one working problem in both themes and on mobile.
+- ✅ All 7 renderers implemented and functional.
+- ✅ One flagship problem complete for each renderer.
+
+### Next: M3
+- Complete traces for all 41 flagship problems (batch job).
+- "Mark as understood" toggle.
+- Custom input validation for player.
+- Shareable URLs and `/progress` dashboard.
+- Search (Ctrl/Cmd+K).
