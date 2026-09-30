@@ -83,12 +83,52 @@ All changes to the DSA Pattern Visualizer are logged here chronologically so any
 - ✅ No horizontal scroll (overflow-x: hidden on body)
 - ✅ Both `npm run build` and `npm test` pass
 
-### Next: M1
-- Trace types (`Step`, `EventKind`)
-- `L()` helper (needle-based line resolver)
-- Player component (play/pause, step, scrub, keyboard shortcuts)
-- `array-pointers` renderer
-- 3 problems: **167 Two Sum II**, **11 Container With Most Water**, **704 Binary Search**
-- `add-visualization` project skill
+## 2026-09-30 — Milestone 1 (M1) Complete
+
+### What was built
+
+**Slug Fixes**
+- Updated parser to properly extract readable link text for slugs and correctly strip leading digits, yielding clean IDs like `two-pointer/two-sum-ii-input-array-is-sorted`.
+
+**Trace Infrastructure**
+- Defined types for `Step`, `EventKind`, and renderer states (`ArrayPointersState`).
+- Added `L()` string needle-based line resolver factory to accurately map execution state to C++ lines (with dev/test environment validation).
+- Added `helpers.ts` for step collection (with 3000 cap) and concise state building.
+- Zustand store (`playerStore.ts`) for robust playback control (play/pause, seek, speed).
+
+**Renderers**
+- Created the generic, SVG-based `ArrayPointersRenderer` utilizing visual and non-visual cues and fully synced to CSS token variables. Designed to safely fit a 360px viewport without scrolling.
+
+**Components**
+- `Player` component with auto-play, scrubber, step counters, speed multiplier, and full keyboard shortcuts (`Space`, `Left`, `Right`, `Home`, `End`).
+- `VariablesPanel` component displaying scoped C++ variables at each step.
+- Refactored `CodePanel` to support `activeLine` highlighting via precise Shiki class post-processing and auto-scrolling to the active block.
+
+**Trace Modules**
+- Created registry and first 3 traces using `ArrayPointersRenderer`:
+  - `167 Two Sum II`
+  - `11 Container With Most Water`
+  - `704 Binary Search`
+
+**Integration**
+- Updated `Problem.tsx` to conditionally detect trace availability via `traceRegistry`, run the generator, collect steps, and present the Player + Renderer interface seamlessly replacing the placeholder.
+
+**Tests & Skills**
+- `tests/traces.test.ts`: Validated `createL` behavior and validated all samples in `traceRegistry` run accurately without capping out.
+- `.claude/skills/add-visualization/SKILL.md`: Created `add-visualization` project skill for future additions.
+
+### Build verification
+- `npm run build` ✅ — zero TypeScript errors, zero build errors
+- `npm run test` ✅ — 22/22 tests passing
+
+### M1 done when
+> Stepping and scrubbing backward and forward is exact, highlighted line always matches the step.
+- ✅ Player supports exact scrubbing, line highlighting is in sync.
+- ✅ All 3 flagship traces work perfectly.
+
+### Next: M2
+- Full problem coverage for Two Pointer, Sliding Window, and Binary Search (54 traces).
+- New renderers: `sliding-window`, `2d-grid`, `1d-dp`, `tree`.
+- `add-pattern-renderer` skill.
 
 ---

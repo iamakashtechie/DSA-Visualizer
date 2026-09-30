@@ -1,8 +1,15 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CodePanel } from '../components/CodePanel';
 import { Badge } from '../components/Badge';
 import { Icon } from '../components/Icon';
+import { usePlayerStore } from '../store/playerStore';
+import { traceRegistry } from '../traces/registry';
+import { createL } from '../traces/lib/lineResolver';
+import { collectSteps } from '../traces/lib/helpers';
+import { ArrayPointersRenderer } from '../renderers/array-pointers/ArrayPointersRenderer';
+import { Player } from '../components/Player';
+import { VariablesPanel } from '../components/VariablesPanel';
 
 interface Problem {
   id: string;
@@ -38,8 +45,35 @@ export function Problem() {
   const { patternSlug, problemSlug } = useParams<{ patternSlug: string; problemSlug: string }>();
   const [activeTab, setActiveTab] = useState<Tab>('code');
 
-  const problem = problems.find((p) => p.id === `${patternSlug}/${problemSlug}`);
+  const problemId = `${patternSlug}/${problemSlug}`;
+  const problem = problems.find((p) => p.id === problemId);
   const pattern = patterns.find((p) => p.slug === patternSlug);
+
+  const traceModule = traceRegistry[problemId];
+
+  const setSteps = usePlayerStore((s) => s.setSteps);
+  const reset = usePlayerStore((s) => s.reset);
+  const stepIndex = usePlayerStore((s) => s.stepIndex);
+  const steps = usePlayerStore((s) => s.steps);
+
+  useEffect(() => {
+    if (!traceModule || !problem?.cpp) {
+      reset();
+      return;
+    }
+    try {
+      const L = createL(problem.cpp);
+      const generator = traceModule.run(traceModule.defaultInput, L);
+      const { steps, capped } = collectSteps(generator);
+      setSteps(steps, capped);
+    } catch (err) {
+      console.error('Failed to run trace:', err);
+      reset();
+    }
+    return () => reset();
+  }, [traceModule, problem, reset, setSteps]);
+
+  const currentStep = steps[stepIndex];
 
   if (!problem || !pattern) {
     return (
@@ -101,18 +135,29 @@ export function Problem() {
       {/* Two-column layout on desktop */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left: Visualization stage */}
-        <div className="lg:w-[58%] lg:shrink-0">
-          {/* Visualization coming soon */}
-          <div className="rounded-xl border border-[--border] border-dashed bg-[--surface] flex flex-col items-center justify-center text-center py-16 px-6 mb-4">
-            <span className="flex items-center justify-center w-14 h-14 rounded-full bg-[--surface-2] text-[--accent] mb-4">
-              <Icon name="play_circle" size={32} />
-            </span>
-            <h2 className="text-base font-semibold text-[--text] mb-2">Visualization Coming Soon</h2>
-            <p className="text-sm text-[--text-muted] max-w-xs">
-              Step-by-step animation of this algorithm will be available in a future milestone.
-              The C++ code and explanation are available now.
-            </p>
-          </div>
+        <div className="lg:w-[58%] lg:shrink-0 flex flex-col gap-4">
+          {traceModule && currentStep ? (
+            <>
+              {currentStep.state.renderer === 'array-pointers' && (
+                <div className="p-4 rounded-xl border border-[--border] bg-[--surface] flex items-center justify-center min-h-[220px]">
+                  <ArrayPointersRenderer state={currentStep.state} />
+                </div>
+              )}
+              <Player />
+              <VariablesPanel vars={currentStep.vars} />
+            </>
+          ) : (
+            <div className="rounded-xl border border-[--border] border-dashed bg-[--surface] flex flex-col items-center justify-center text-center py-16 px-6">
+              <span className="flex items-center justify-center w-14 h-14 rounded-full bg-[--surface-2] text-[--accent] mb-4">
+                <Icon name="play_circle" size={32} />
+              </span>
+              <h2 className="text-base font-semibold text-[--text] mb-2">Visualization Coming Soon</h2>
+              <p className="text-sm text-[--text-muted] max-w-xs">
+                Step-by-step animation of this algorithm will be available in a future milestone.
+                The C++ code and explanation are available now.
+              </p>
+            </div>
+          )}
 
           {/* Description */}
           {problem.description && (
@@ -157,7 +202,7 @@ export function Problem() {
             hidden={activeTab !== 'code'}
           >
             {problem.cpp ? (
-              <CodePanel code={problem.cpp} language="cpp" />
+              <CodePanel code={problem.cpp} language="cpp" activeLine={currentStep?.line} />
             ) : (
               <p className="text-sm text-[--text-muted]">No code available.</p>
             )}

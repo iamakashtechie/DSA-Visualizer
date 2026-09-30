@@ -1,6 +1,6 @@
 [
   {
-    "id": "two-pointer/1",
+    "id": "two-pointer/two-sum-ii-input-array-is-sorted",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 1,
@@ -15,7 +15,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/2",
+    "id": "two-pointer/valid-palindrome",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 2,
@@ -30,7 +30,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/3",
+    "id": "two-pointer/container-with-most-water",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 3,
@@ -45,7 +45,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/4",
+    "id": "two-pointer/3sum",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 4,
@@ -60,7 +60,7 @@
     "complexityRaw": "Time: O(n²)   Space: O(1) extra (excluding output)"
   },
   {
-    "id": "two-pointer/5",
+    "id": "two-pointer/3sum-closest",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 5,
@@ -75,7 +75,7 @@
     "complexityRaw": "Time: O(n²)   Space: O(1)"
   },
   {
-    "id": "two-pointer/6",
+    "id": "two-pointer/4sum",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 6,
@@ -90,7 +90,7 @@
     "complexityRaw": "Time: O(n³)   Space: O(1) extra"
   },
   {
-    "id": "two-pointer/7",
+    "id": "two-pointer/trapping-rain-water",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 7,
@@ -105,7 +105,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/8",
+    "id": "two-pointer/squares-of-a-sorted-array",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 8,
@@ -120,7 +120,7 @@
     "complexityRaw": "Time: O(n)   Space: O(n) for output"
   },
   {
-    "id": "two-pointer/9",
+    "id": "two-pointer/reverse-string",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 1: Opposite-Direction Pointers (converge from both ends)",
     "order": 9,
@@ -135,7 +135,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/10",
+    "id": "two-pointer/remove-duplicates-from-sorted-array",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 2: Same-Direction Pointers (slow / fast, in-place overwrite)",
     "order": 10,
@@ -150,7 +150,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/11",
+    "id": "two-pointer/move-zeroes",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 2: Same-Direction Pointers (slow / fast, in-place overwrite)",
     "order": 11,
@@ -165,7 +165,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/dutch-national-flag-3-pointer-variant",
+    "id": "two-pointer/sort-colors-dutch-national-flag-3-pointer-variant",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 2: Same-Direction Pointers (slow / fast, in-place overwrite)",
     "order": 12,
@@ -180,7 +180,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/13",
+    "id": "two-pointer/merge-sorted-array",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 2: Same-Direction Pointers (slow / fast, in-place overwrite)",
     "order": 13,
@@ -195,7 +195,7 @@
     "complexityRaw": "Time: O(m + n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/14",
+    "id": "two-pointer/intersection-of-two-arrays-ii",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 2: Same-Direction Pointers (slow / fast, in-place overwrite)",
     "order": 14,
@@ -210,7 +210,7 @@
     "complexityRaw": "Time: O(n log n + m log m)   Space: O(1) extra (excluding output)"
   },
   {
-    "id": "two-pointer/floyds-algorithm",
+    "id": "two-pointer/linked-list-cycle-floyds-algorithm",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 3: Fast & Slow Pointers on Linked Lists",
     "order": 15,
@@ -225,7 +225,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/16",
+    "id": "two-pointer/middle-of-the-linked-list",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 3: Fast & Slow Pointers on Linked Lists",
     "order": 16,
@@ -240,7 +240,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/17",
+    "id": "two-pointer/remove-nth-node-from-end-of-list",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 3: Fast & Slow Pointers on Linked Lists",
     "order": 17,
@@ -255,7 +255,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/18",
+    "id": "two-pointer/palindrome-linked-list",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 3: Fast & Slow Pointers on Linked Lists",
     "order": 18,
@@ -270,7 +270,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/19",
+    "id": "two-pointer/minimum-size-subarray-sum",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 4: Sliding Window (a two-pointer variant with a shrinking/expanding window)",
     "order": 19,
@@ -285,7 +285,7 @@
     "complexityRaw": "Time: O(n)   Space: O(1)"
   },
   {
-    "id": "two-pointer/20",
+    "id": "two-pointer/longest-substring-without-repeating-characters",
     "patternSlug": "two-pointer",
     "groupTitle": "Pattern 4: Sliding Window (a two-pointer variant with a shrinking/expanding window)",
     "order": 20,
@@ -1798,7 +1798,7 @@
     "complexityRaw": "Time: O(rows × cols). Space: O(rows × cols) for the queue."
   },
   {
-    "id": "graph/01-matrix",
+    "id": "graph/matrix",
     "patternSlug": "graph",
     "groupTitle": "D. BFS Shortest Path (Unweighted Graphs)",
     "order": 117,

@@ -77,6 +77,21 @@ code, pre, .font-mono {
   margin: 0;
 }
 
+/* Each Shiki line is a display block so we can highlight it */
+.code-panel .line {
+  display: block;
+  padding: 1px 0.75rem;
+  border-left: 2px solid transparent;
+  line-height: 1.6;
+  transition: background 0.15s ease;
+}
+
+/* Active line: left accent bar + background tint */
+.code-panel .line--active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-left-color: var(--accent);
+}
+
 /* Fallback code styling */
 .shiki-fallback {
   color: var(--text);

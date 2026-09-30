@@ -108,12 +108,22 @@ function isGfG(url: string): boolean {
   return url.includes('geeksforgeeks') || url.includes('gfg');
 }
 
-function makeId(patternSlug: string, title: string, seen: Set<string>): string {
-  let slug = toSlug(title);
-  // Remove leading LC number from slug e.g. "167-two-sum-ii" → "two-sum-ii"
-  slug = slug.replace(/^\d+-/, '');
+function makeId(patternSlug: string, rawTitle: string, seen: Set<string>): string {
+  // If heading embeds a markdown link, extract the link text as the base
+  // e.g. "1. [167. Two Sum II](url)" → "167. Two Sum II"
+  let base = rawTitle.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  // Strip ALL leading "N. " / "N.M. " numbering prefixes (loop until stable)
+  // Uses a space requirement so "3Sum" or "4Sum" (no space after digit) is preserved
+  let prev: string;
+  do {
+    prev = base;
+    base = base.replace(/^[\d.]+\s+/, '').trim();
+  } while (base !== prev);
+  // Fall back if nothing meaningful remains
+  if (base.length < 2) base = rawTitle.replace(/[[\]()]/g, '');
+  let slug = toSlug(base);
+  if (!slug) slug = 'problem';
   let id = `${patternSlug}/${slug}`;
-  // Collision: append suffix
   let suffix = 2;
   while (seen.has(id)) {
     id = `${patternSlug}/${slug}-${suffix++}`;
