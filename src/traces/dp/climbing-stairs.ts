@@ -18,109 +18,114 @@ export const trace: TraceModule<Input> = {
     { input: { n: 3 }, expected: 3 },
     { input: { n: 5 }, expected: 8 },
   ],
+  // Actual C++:
+  //   int climbStairs(int n) {
+  //     if (n <= 1) return 1;
+  //     int prev2 = 1, prev1 = 1; // ways to reach step 0 and step 1
+  //     for (int i = 2; i <= n; i++) {
+  //         int cur = prev1 + prev2;
+  //         prev2 = prev1;
+  //         prev1 = cur;
+  //     }
+  //     return prev1;
+  //   }
   run: function* (input, L) {
     const { n } = input;
 
-    // Helper to generate the table state
-    const getState = (dp: number[], pointers?: { i?: number }): DPTableState => {
+    // Helper to render a 2-cell "prev2 | prev1" DP table
+    const getState = (prev2: number | null, prev1: number | null, step: number): DPTableState => {
       const table = [
-        dp.map((val, idx) => ({
-          id: `cell-${idx}`,
-          value: val === -1 ? '' : val,
-          state: (pointers?.i === idx ? 'pointer-a' : (val !== -1 ? 'success' : 'idle')) as any,
-        }))
+        [
+          {
+            id: 'prev2',
+            value: prev2 === null ? '' : prev2,
+            state: 'idle' as const,
+          },
+          {
+            id: 'prev1',
+            value: prev1 === null ? '' : prev1,
+            state: 'pointer-a' as const,
+          },
+        ],
       ];
-      const colLabels = Array.from({ length: n + 1 }, (_, i) => `i=${i}`);
-      
-      const ptrs = [];
-      if (pointers?.i !== undefined && pointers.i >= 0 && pointers.i <= n) {
-        ptrs.push({ r: 0, c: pointers.i, variant: 'a' as const, name: 'i' });
-      }
-
       return {
         renderer: 'dp-table',
         table,
-        colLabels,
-        rowLabels: ['dp'],
-        pointers: ptrs,
+        colLabels: ['prev2', 'prev1'],
+        rowLabels: [`i=${step}`],
+        pointers: [],
       };
     };
 
     yield {
-      line: L('if (n <= 2) return n;'),
+      line: L('if (n <= 1) return 1;'),
       event: 'init',
-      state: getState(Array(n + 1).fill(-1)),
+      state: getState(null, null, 0),
       vars: { n },
-      note: 'Base case check: if n <= 2, the answer is just n.',
+      note: 'Base case: if n ≤ 1, there is exactly 1 way.',
     } as Step;
 
-    if (n <= 2) {
+    if (n <= 1) {
       yield {
-        line: L('if (n <= 2) return n;'),
+        line: L('if (n <= 1) return 1;'),
         event: 'done',
-        state: getState(Array(n + 1).fill(-1)),
+        state: getState(null, 1, 1),
         vars: { n },
-        note: 'n is small enough to return directly.',
-        result: n,
+        note: 'n ≤ 1, return 1 immediately.',
+        result: 1,
       } as Step;
       return;
     }
 
-    const dp = Array(n + 1).fill(-1);
-    
+    let prev2 = 1;
+    let prev1 = 1;
+
     yield {
-      line: L('vector<int> dp(n + 1);'),
+      line: L('int prev2 = 1, prev1 = 1;'),
       event: 'init',
-      state: getState(dp),
-      vars: { n },
-      note: 'Initialize DP table of size n+1.',
+      state: getState(prev2, prev1, 1),
+      vars: { n, prev2, prev1 },
+      note: 'prev2 = ways to step 0, prev1 = ways to step 1, both start at 1.',
     } as Step;
 
-    dp[1] = 1;
-    yield {
-      line: L('dp[1] = 1;'),
-      event: 'record',
-      state: getState(dp),
-      vars: { n },
-      note: '1 way to climb 1 step.',
-    } as Step;
-
-    dp[2] = 2;
-    yield {
-      line: L('dp[2] = 2;'),
-      event: 'record',
-      state: getState(dp),
-      vars: { n },
-      note: '2 ways to climb 2 steps (1+1 or 2).',
-    } as Step;
-
-    for (let i = 3; i <= n; i++) {
+    for (let i = 2; i <= n; i++) {
       yield {
-        line: L('for (int i = 3; i <= n; i++) {'),
+        line: L('for (int i = 2; i <= n; i++) {'),
         event: 'compare',
-        state: getState(dp, { i }),
-        vars: { n, i },
-        note: `Calculating ways for step ${i}.`,
+        state: getState(prev2, prev1, i),
+        vars: { n, i, prev2, prev1 },
+        note: `Starting step ${i}: ways = prev1 (${prev1}) + prev2 (${prev2}).`,
       } as Step;
 
-      dp[i] = dp[i - 1] + dp[i - 2];
-      
+      const cur = prev1 + prev2;
+
       yield {
-        line: L('dp[i] = dp[i - 1] + dp[i - 2];'),
+        line: L('int cur = prev1 + prev2;'),
         event: 'record',
-        state: getState(dp, { i }),
-        vars: { n, i },
-        note: `dp[${i}] = dp[${i-1}] (${dp[i-1]}) + dp[${i-2}] (${dp[i-2]}) = ${dp[i]}.`,
+        state: getState(prev2, prev1, i),
+        vars: { n, i, prev2, prev1, cur },
+        note: `cur = ${prev1} + ${prev2} = ${cur} ways to reach step ${i}.`,
+      } as Step;
+
+      prev2 = prev1;
+      prev1 = cur;
+
+      yield {
+        line: L('prev1 = cur;'),
+        event: 'write',
+        state: getState(prev2, prev1, i),
+        vars: { n, i, prev2, prev1 },
+        note: 'Slide the window: prev2 ← old prev1, prev1 ← cur.',
       } as Step;
     }
 
     yield {
-      line: L('return dp[n];'),
+      line: L('return prev1;'),
       event: 'done',
-      state: getState(dp),
-      vars: { n },
-      note: 'Loop finished. Return the last element.',
-      result: dp[n],
+      state: getState(prev2, prev1, n),
+      vars: { n, prev2, prev1 },
+      note: `Answer: ${prev1} distinct ways to climb ${n} steps.`,
+      result: prev1,
     } as Step;
   },
 };

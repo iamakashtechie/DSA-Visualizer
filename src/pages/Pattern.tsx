@@ -1,6 +1,7 @@
 import { useParams, Link, NavLink } from 'react-router-dom';
 import { Badge } from '../components/Badge';
 import { Icon } from '../components/Icon';
+import { traceRegistry } from '../traces/registry';
 
 interface Problem {
   id: string;
@@ -128,11 +129,18 @@ export function Pattern() {
                           <span className="text-xs text-[--text-muted] shrink-0">#{problem.lcNumber}</span>
                         )}
 
-                        {/* Coming soon badge */}
-                        <Badge variant="muted" size="sm">
-                          <Icon name="schedule" size={10} />
-                          Visualization soon
-                        </Badge>
+                        {/* Visualized / coming-soon badge */}
+                        {traceRegistry[problem.id] ? (
+                          <Badge variant="success" size="sm">
+                            <Icon name="play_circle" size={10} />
+                            Visualized
+                          </Badge>
+                        ) : (
+                          <Badge variant="muted" size="sm">
+                            <Icon name="schedule" size={10} />
+                            Soon
+                          </Badge>
+                        )}
 
                         {/* Source link */}
                         {problem.url && (

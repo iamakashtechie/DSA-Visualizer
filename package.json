@@ -9,6 +9,7 @@
     "prebuild": "tsx scripts/build-content.ts",
     "build": "tsc && vite build",
     "test": "vitest run",
+    "scaffold": "node scripts/scaffold_traces.js",
     "preview": "vite preview"
   },
   "dependencies": {

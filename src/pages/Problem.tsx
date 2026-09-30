@@ -1,9 +1,10 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { CodePanel } from '../components/CodePanel';
 import { Badge } from '../components/Badge';
 import { Icon } from '../components/Icon';
 import { usePlayerStore } from '../store/playerStore';
+import { useProgressStore } from '../store/progressStore';
 import { traceRegistry } from '../traces/registry';
 import { createL } from '../traces/lib/lineResolver';
 import { collectSteps } from '../traces/lib/helpers';
@@ -18,6 +19,7 @@ import { BitGridRenderer } from '../renderers/bit-grid/BitGridRenderer';
 import { SidePanels } from '../renderers/panels/SidePanels';
 import { Player } from '../components/Player';
 import { VariablesPanel } from '../components/VariablesPanel';
+import { CustomInputPanel } from '../components/CustomInputPanel';
 
 interface Problem {
   id: string;
@@ -63,6 +65,15 @@ export function Problem() {
   const reset = usePlayerStore((s) => s.reset);
   const stepIndex = usePlayerStore((s) => s.stepIndex);
   const steps = usePlayerStore((s) => s.steps);
+  const seek = usePlayerStore((s) => s.seek);
+
+  const completed = useProgressStore((s) => s.completed[problemId] || false);
+  const toggleCompleted = useProgressStore((s) => s.toggleCompleted);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [copied, setCopied] = useState(false);
+  const [customInput, setCustomInput] = useState<any>(null);
+  const [urlInputError, setUrlInputError] = useState(false);
 
   useEffect(() => {
     if (!traceModule || !problem?.cpp) {
@@ -71,15 +82,82 @@ export function Problem() {
     }
     try {
       const L = createL(problem.cpp);
-      const generator = traceModule.run(traceModule.defaultInput, L);
+      
+      let inputToUse = traceModule.defaultInput;
+      const inputParam = searchParams.get('input');
+      // let urlHasError = false;
+      if (inputParam) {
+        try {
+          // searchParams.get() already decodes the URI component
+          // Additionally, backward compatibility check: if it starts with %7B it might be double encoded, but JSON.parse will throw and we handle it
+          let parsed;
+          try {
+            parsed = JSON.parse(inputParam);
+          } catch (e) {
+            // Try decoding once more in case it was double encoded by the older implementation
+            parsed = JSON.parse(decodeURIComponent(inputParam));
+          }
+          inputToUse = parsed;
+          if (customInput === null) {
+            setCustomInput(inputToUse);
+          }
+          setUrlInputError(false);
+        } catch (e) {
+          console.error("Invalid custom input in URL:", e);
+          setUrlInputError(true);
+        }
+      } else if (customInput) {
+        inputToUse = customInput;
+        setUrlInputError(false);
+      } else {
+        setCustomInput(traceModule.defaultInput);
+        setUrlInputError(false);
+      }
+
+      const generator = traceModule.run(inputToUse, L);
       const { steps, capped } = collectSteps(generator);
       setSteps(steps, capped);
+
+      const stepParam = searchParams.get('step');
+      if (stepParam) {
+        const parsed = parseInt(stepParam, 10);
+        if (!isNaN(parsed) && parsed >= 0 && parsed < steps.length) {
+          seek(parsed);
+        }
+      }
     } catch (err) {
       console.error('Failed to run trace:', err);
       reset();
     }
     return () => reset();
-  }, [traceModule, problem, reset, setSteps]);
+  }, [traceModule, problem, reset, setSteps, seek, searchParams, customInput]);
+
+  const handleCustomInputSubmit = (input: any) => {
+    setCustomInput(input);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('input', JSON.stringify(input));
+    newParams.delete('step');
+    setSearchParams(newParams, { replace: true });
+  };
+
+  // Sync step changes to URL
+  useEffect(() => {
+    if (steps.length > 0 && stepIndex > 0) {
+      setSearchParams({ step: stepIndex.toString() }, { replace: true });
+    } else if (steps.length > 0 && stepIndex === 0) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [stepIndex, steps.length, setSearchParams]);
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy', err);
+    }
+  };
 
   const currentStep = steps[stepIndex];
 
@@ -108,21 +186,43 @@ export function Problem() {
       </nav>
 
       {/* Problem header */}
-      <div className="mb-6">
-        <div className="flex items-start gap-3 flex-wrap mb-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-[--text] flex-1 min-w-0">{problem.title}</h1>
-          {problem.url && (
-            <a
-              href={problem.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface] text-xs font-medium text-[--text-muted] hover:text-[--accent] hover:border-[--accent]/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--focus]"
+      <div className="mb-6 flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-3 flex-wrap flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-[--text]">{problem.title}</h1>
+            {problem.url && (
+              <a
+                href={problem.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface] text-xs font-medium text-[--text-muted] hover:text-[--accent] hover:border-[--accent]/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--focus]"
+              >
+                <Icon name="open_in_new" size={13} />
+                {problem.sourceLabel}
+                {problem.lcNumber ? ` #${problem.lcNumber}` : ''}
+              </a>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleShare}
+              className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface] text-sm font-medium text-[--text-muted] hover:text-[--text] hover:border-[--text-muted]/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--focus]"
             >
-              <Icon name="open_in_new" size={13} />
-              {problem.sourceLabel}
-              {problem.lcNumber ? ` #${problem.lcNumber}` : ''}
-            </a>
-          )}
+              <Icon name={copied ? 'check' : 'share'} size={18} />
+              {copied ? 'Copied' : 'Share'}
+            </button>
+            <button
+              onClick={() => toggleCompleted(problemId)}
+              className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--focus] ${
+                completed
+                  ? 'bg-[--viz-success]/10 border-[--viz-success]/20 text-[--viz-success]'
+                  : 'bg-[--surface] border-[--border] text-[--text-muted] hover:text-[--text] hover:border-[--text-muted]/40'
+              }`}
+            >
+              <Icon name={completed ? 'check_circle' : 'radio_button_unchecked'} size={18} />
+              {completed ? 'Understood' : 'Mark as understood'}
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="accent">{pattern.title}</Badge>
@@ -139,6 +239,26 @@ export function Problem() {
           )}
         </div>
       </div>
+
+      {urlInputError && (
+        <div className="mb-6 p-4 rounded-xl bg-[--viz-danger]/10 border border-[--viz-danger]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-[--viz-danger]">
+            <Icon name="error" size={20} />
+            <p>The custom input in the URL is invalid or malformed. Using default input instead.</p>
+          </div>
+          <button
+            onClick={() => {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.delete('input');
+              setSearchParams(newParams, { replace: true });
+              setUrlInputError(false);
+            }}
+            className="text-xs px-3 py-1.5 rounded bg-[--viz-danger]/20 text-[--viz-danger] hover:bg-[--viz-danger]/30 transition-colors font-medium whitespace-nowrap"
+          >
+            Clear URL Input
+          </button>
+        </div>
+      )}
 
       {/* Two-column layout on desktop */}
       <div className="flex flex-col lg:flex-row gap-6">
@@ -189,6 +309,11 @@ export function Problem() {
               <SidePanels state={currentStep.state} />
               <Player />
               <VariablesPanel vars={currentStep.vars} />
+              <CustomInputPanel 
+                schema={traceModule.inputSchema}
+                defaultInput={traceModule.defaultInput}
+                onSubmit={handleCustomInputSubmit}
+              />
             </>
           ) : (
             <div className="rounded-xl border border-[--border] border-dashed bg-[--surface] flex flex-col items-center justify-center text-center py-16 px-6">

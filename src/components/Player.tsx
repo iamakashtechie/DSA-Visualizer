@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { usePlayerStore } from '../store/playerStore';
 import { Icon } from './Icon';
 
@@ -18,6 +18,9 @@ export function Player() {
   const seek = usePlayerStore((s) => s.seek);
   const setIsPlaying = usePlayerStore((s) => s.setIsPlaying);
   const setSpeed = usePlayerStore((s) => s.setSpeed);
+
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpRef = useRef<HTMLDivElement>(null);
 
   const stepIndexRef = useRef(stepIndex);
   stepIndexRef.current = stepIndex;
@@ -66,6 +69,12 @@ export function Player() {
       } else if (e.code === 'End') {
         e.preventDefault();
         end();
+      } else if (e.key === '?') {
+        // Don't fire if typing in an input
+        e.preventDefault();
+        setHelpOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        setHelpOpen(false);
       }
     },
     [steps.length, isPlaying, next, prev, reset, end, seek, setIsPlaying],
@@ -75,6 +84,18 @@ export function Player() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [handleKey]);
+
+  // Close help popover when clicking outside
+  useEffect(() => {
+    if (!helpOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
+        setHelpOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [helpOpen]);
 
   if (steps.length === 0) return null;
 
@@ -174,15 +195,70 @@ export function Player() {
           </ControlButton>
         </div>
 
-        {/* Speed */}
-        <button
-          onClick={cycleSpeed}
-          aria-label={`Playback speed: ${speed}× (click to change)`}
-          title="Cycle playback speed"
-          className="text-xs font-medium text-[--text-muted] hover:text-[--text] px-2 py-1 rounded-md hover:bg-[--surface-2] transition-colors focus-visible:outline-2 focus-visible:outline-[--focus] min-w-[3rem] text-center"
-        >
-          {speed}×
-        </button>
+        {/* Speed + Help */}
+        <div className="flex items-center gap-1 relative" ref={helpRef}>
+          <button
+            onClick={cycleSpeed}
+            aria-label={`Playback speed: ${speed}× (click to change)`}
+            title="Cycle playback speed"
+            className="text-xs font-medium text-[--text-muted] hover:text-[--text] px-2 py-1 rounded-md hover:bg-[--surface-2] transition-colors focus-visible:outline-2 focus-visible:outline-[--focus] min-w-[3rem] text-center"
+          >
+            {speed}×
+          </button>
+
+          {/* Help button */}
+          <button
+            onClick={() => setHelpOpen((prev) => !prev)}
+            aria-label="Keyboard shortcuts (?)"
+            aria-expanded={helpOpen}
+            title="Keyboard shortcuts (?)"
+            className={`w-7 h-7 flex items-center justify-center rounded-md text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-[--focus] ${
+              helpOpen
+                ? 'bg-[--accent] text-[--accent-contrast]'
+                : 'text-[--text-muted] hover:text-[--text] hover:bg-[--surface-2]'
+            }`}
+          >
+            ?
+          </button>
+
+          {/* Help popover */}
+          {helpOpen && (
+            <div
+              role="dialog"
+              aria-label="Keyboard shortcuts"
+              className="absolute bottom-full right-0 mb-2 w-64 bg-[--surface] border border-[--border] rounded-xl shadow-lg p-4 z-50"
+            >
+              <h3 className="text-xs font-semibold text-[--text] mb-3 flex items-center justify-between">
+                Keyboard Shortcuts
+                <button
+                  onClick={() => setHelpOpen(false)}
+                  aria-label="Close shortcuts panel"
+                  className="text-[--text-muted] hover:text-[--text] transition-colors focus-visible:outline-2 focus-visible:outline-[--focus] rounded"
+                >
+                  <Icon name="close" size={14} />
+                </button>
+              </h3>
+              <div className="flex flex-col gap-2">
+                {[
+                  { key: 'Space', label: 'Play / Pause' },
+                  { key: '←', label: 'Step back' },
+                  { key: '→', label: 'Step forward' },
+                  { key: 'Home', label: 'Jump to start' },
+                  { key: 'End', label: 'Jump to end' },
+                  { key: '?', label: 'Toggle this panel' },
+                  { key: 'Ctrl+K', label: 'Search problems' },
+                ].map(({ key, label }) => (
+                  <div key={key} className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-[--text-muted]">{label}</span>
+                    <kbd className="text-[10px] font-mono font-semibold bg-[--surface-2] border border-[--border] rounded px-1.5 py-0.5 text-[--text] shrink-0">
+                      {key}
+                    </kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Counters ── */}

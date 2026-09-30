@@ -37,12 +37,9 @@ x++;
   });
 });
 
-describe('Trace Modules', () => {
-  // We mock a dummy L() for tests that just returns 1 for everything
-  // unless we actually pass the problem's cpp. Since we don't load problems.json
-  // here natively without async, we can just use a dummy L() to verify trace logic.
-  const dummyL = () => 1;
+import problems from '../src/generated/problems.json';
 
+describe('Trace Modules', () => {
   for (const [id, trace] of Object.entries(traceRegistry)) {
     describe(`Trace: ${id}`, () => {
       it('has required properties', () => {
@@ -54,10 +51,13 @@ describe('Trace Modules', () => {
         expect(typeof trace.run).toBe('function');
       });
 
+      const problem = problems.find(p => p.id === id);
+      const L = problem ? createL(problem.cpp) : () => 1;
+
       for (let i = 0; i < trace.samples.length; i++) {
         const sample = trace.samples[i];
         it(`sample ${i + 1} produces expected result`, () => {
-          const gen = trace.run(sample.input, dummyL);
+          const gen = trace.run(sample.input, L);
           const { steps, capped } = collectSteps(gen);
           
           expect(capped).toBe(false);

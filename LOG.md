@@ -163,3 +163,75 @@ Built 7 new custom SVG-based renderers, fully responsive down to 360px viewport,
 - Custom input validation for player.
 - Shareable URLs and `/progress` dashboard.
 - Search (Ctrl/Cmd+K).
+
+## 2026-09-30 — Milestone 3 (M3) Complete
+
+### What was built
+
+**Flagship Traces (All 41 Problems Complete)**
+- Fully implemented and verified traces across all 8 patterns (41 flagship problems):
+  - **Two Pointer (5):** Two Sum II, Container With Most Water, Trapping Rain Water, Sort Colors, Linked List Cycle
+  - **Sliding Window (5):** Maximum Average Subarray I, Longest Substring Without Repeating Characters, Minimum Window Substring, Sliding Window Maximum, Longest Repeating Character Replacement
+  - **Binary Search (5):** Binary Search, Search in Rotated Sorted Array, Koko Eating Bananas, Aggressive Cows, Search a 2D Matrix
+  - **Backtracking (6):** Subsets, Permutations, Combination Sum, Generate Parentheses, N-Queens, Word Search
+  - **Greedy (5):** Non-overlapping Intervals, Merge Intervals, Jump Game, Remove K Digits, IPO
+  - **Bit Manipulation (5):** Number of 1 Bits, Single Number, Single Number III, Subsets (Bitmask), Sum of Two Integers
+  - **Graph (5):** Number of Islands, Number of Provinces, Course Schedule, Rotting Oranges, Network Delay Time
+  - **Dynamic Programming (5):** Climbing Stairs, House Robber, Coin Change, Longest Common Subsequence, Edit Distance
+
+**Trace & Type Fixes & Alignment**
+- Aligned `climbing-stairs.ts` with verbatim C++ iterative code (prev1/prev2, matching exact line needles).
+- Aligned `merge-intervals.ts` with verbatim C++ code (vector<vector<int>> result, for-each loop, matching line needles).
+- Fixed `search-a-2d-matrix.ts`, `search-in-rotated-sorted-array.ts`, `aggressive-cows.ts`, and `koko-eating-bananas.ts` to strictly conform to `ArrayCell`, pointer variants, and valid `EventKind` semantics with step notes.
+- Added `'calc'` event to `EventKind` in `types.ts` for clean window/intermediate calculations.
+- Fixed `ArrayPointersState` and `ArrayCell` imports in `trapping-rain-water.ts`.
+- Serialized `res` array to string in `vars` for `sliding-window-maximum.ts`.
+
+**Interactive Features & UI**
+- **Pattern Page Badging:** Added dynamic "Visualized" badge (green) for problems registered in `traceRegistry` vs "Soon" for remaining problems.
+- **Progress Page Completeness:** Expanded `/progress` to display all problems per pattern with interactive "Mark as understood" checkboxes and completion tracking.
+- **Keyboard Shortcut Help Popover:** Added an accessible `?` key help dialog in `Player.tsx` displaying all player and global shortcuts (`Space`, `←`, `→`, `Home`, `End`, `?`, `Ctrl+K`), with outside-click and `Escape` dismissals.
+- **Custom Input Validation:** `CustomInputPanel.tsx` with schema checking, input caps, reset-to-default, and live error display.
+- **Shareable URLs:** Step state and encoded custom input synchronization (`?step=N&input=...`) via `useSearchParams`.
+- **Search (Ctrl/Cmd+K):** Modal search across all 144 problems with arrow key navigation and instant jump.
+
+### Build verification
+- `npm run build` ✅ — zero TypeScript errors, zero build errors
+- `npm run test` ✅ — 126/126 tests passing across `content-parser.test.ts` (15) and `traces.test.ts` (111)
+
+### M3 done when
+> All 41 flagship problems visualized, custom input works with validation, shareable URLs, search (Ctrl/Cmd+K), and progress tracking all working.
+- ✅ All 41 flagship problem traces functional and tested.
+- ✅ Custom input panel with validation and caps.
+- ✅ Shareable URLs with `?step=` and `?input=`.
+- ✅ Global search with `Ctrl+K` modal.
+- ✅ Complete `/progress` dashboard with persistent localStorage progress.
+- ✅ Keyboard shortcuts help popover (`?`).
+
+### Next: M4
+- Polish and ship.
+- Mobile pass at 360/390/768 px.
+- Accessibility audit (focus states, ARIA, touch targets, contrast, reduced motion).
+- Performance pass (lazy-load traces and Shiki, bundle optimizations).
+- Error/empty/404 state polish.
+- Deployment verification.
+
+## 2026-09-30 — Complete Visualization Milestone
+
+### What changed
+
+- Implemented algorithm-specific trace modules for all remaining Two Pointer, Sliding Window, Binary Search, Bit Manipulation, Greedy, DP, Graph, and Backtracking problems.
+- Added meaningful renderer state transitions, problem-specific inputs, schemas, samples, variables, notes, and final results across all 144 problems.
+- Removed the temporary generic code-flow fallback and the stale linked-list registry alias.
+- Registry coverage is now exactly 144 generated problems to 144 concrete traces.
+
+### Verification
+
+- `npm run test` — 454/454 tests passing.
+- Registry verification — 144 problems, 144 traces, 0 missing, 0 extra.
+- `npm run build` — successful production build with exit code 0.
+
+### Next
+
+- M4 polish can now begin: responsive, accessibility, performance, error-state, and deployment verification.
+

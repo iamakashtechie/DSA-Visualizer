@@ -117,6 +117,7 @@ export type EventKind =
   | 'expand'
   | 'shrink'
   | 'record'
+  | 'calc'
   | 'choose'
   | 'explore'
   | 'unchoose'

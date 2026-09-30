@@ -58,23 +58,8 @@ export const trace: TraceModule<Input> = {
       };
     };
 
-    yield {
-      line: L('if (intervals.empty()) return {};'),
-      event: 'init',
-      state: getState(intervals, []),
-      vars: {},
-      note: 'Check if intervals is empty.',
-    } as Step;
 
     if (intervals.length === 0) {
-      yield {
-        line: L('if (intervals.empty()) return {};'),
-        event: 'done',
-        state: getState([], []),
-        vars: {},
-        note: 'Empty, returning [].',
-        result: []
-      } as Step;
       return;
     }
 
@@ -84,78 +69,62 @@ export const trace: TraceModule<Input> = {
       event: 'record',
       state: getState(sorted, []),
       vars: {},
-      note: 'Sort intervals by starting time.',
+      note: 'Sort intervals by start time so we can scan left to right.',
     } as Step;
 
-    const merged: [number, number][] = [];
-    merged.push([...sorted[0]]);
+    const result: [number, number][] = [];
 
-    yield {
-      line: L('merged.push_back(intervals[0]);'),
-      event: 'record',
-      state: getState(sorted, merged, 1),
-      vars: {},
-      note: 'Push the first interval into the merged list.',
-    } as Step;
-
-    for (let i = 1; i < sorted.length; i++) {
-      const current = sorted[i];
-      const lastMerged = merged[merged.length - 1];
+    for (let i = 0; i < sorted.length; i++) {
+      const interval = sorted[i];
 
       yield {
-        line: L('for (int i = 1; i < intervals.size(); i++) {'),
+        line: L('for (auto& interval : intervals) {'),
         event: 'compare',
-        state: getState(sorted, merged, i, current[0]),
-        vars: { i },
-        note: `Consider interval [${current[0]}, ${current[1]}].`,
+        state: getState(sorted, result, i, interval[0]),
+        vars: { 'interval[0]': interval[0], 'interval[1]': interval[1] },
+        note: `Examining interval [${interval[0]}, ${interval[1]}].`,
       } as Step;
 
-      if (lastMerged[1] >= current[0]) {
+      if (result.length === 0 || result[result.length - 1][1] < interval[0]) {
         yield {
-          line: L('if (merged.back()[1] >= intervals[i][0]) {'),
+          line: L('if (result.empty() || result.back()[1] < interval[0]) {'),
           event: 'compare',
-          state: getState(sorted, merged, i, current[0]),
-          vars: { i },
-          note: `Overlaps! ${lastMerged[1]} >= ${current[0]}.`,
+          state: getState(sorted, result, i, interval[0]),
+          vars: { 'interval[0]': interval[0], 'interval[1]': interval[1] },
+          note: result.length === 0
+            ? 'result is empty — push first interval.'
+            : `No overlap: last end (${result[result.length - 1][1]}) < current start (${interval[0]}).`,
         } as Step;
 
-        lastMerged[1] = Math.max(lastMerged[1], current[1]);
-        
+        result.push([...interval]);
+
         yield {
-          line: L('merged.back()[1] = max(merged.back()[1], intervals[i][1]);'),
+          line: L('result.push_back(interval);'),
           event: 'record',
-          state: getState(sorted, merged, i + 1),
-          vars: { i },
-          note: `Merge them: end becomes max(${lastMerged[1]}, ${current[1]}).`,
+          state: getState(sorted, result, i + 1),
+          vars: { 'interval[0]': interval[0], 'interval[1]': interval[1] },
+          note: 'No overlap — push as a new distinct interval.',
         } as Step;
       } else {
         yield {
-          line: L('} else {'),
-          event: 'compare',
-          state: getState(sorted, merged, i, current[0]),
-          vars: { i },
-          note: `No overlap: ${lastMerged[1]} < ${current[0]}.`,
-        } as Step;
-
-        merged.push([...current]);
-
-        yield {
-          line: L('merged.push_back(intervals[i]);'),
+          line: L('result.back()[1] = max(result.back()[1], interval[1]);'),
           event: 'record',
-          state: getState(sorted, merged, i + 1),
-          vars: { i },
-          note: 'Add it as a new distinct interval.',
+          state: getState(sorted, result, i + 1),
+          vars: { 'interval[0]': interval[0], 'interval[1]': interval[1] },
+          note: `Overlap — extend last interval's end to max(${result[result.length - 1][1]}, ${interval[1]}).`,
         } as Step;
+
+        result[result.length - 1][1] = Math.max(result[result.length - 1][1], interval[1]);
       }
     }
 
     yield {
-      line: L('return merged;'),
+      line: L('return result;'),
       event: 'done',
-      state: getState(sorted, merged, sorted.length),
+      state: getState(sorted, result, sorted.length),
       vars: {},
-      note: 'All intervals processed.',
-      result: merged,
+      note: `Done. ${result.length} merged interval(s).`,
+      result,
     } as Step;
   },
 };
